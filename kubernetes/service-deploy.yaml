@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubecon-service
+  labels:
+    app: kubecon-service
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: kubecon-service
+  template:
+    metadata:
+      labels:
+        app: kubecon-service
+    spec:
+      containers:
+      - name: service
+        image: dlespiau/kubecon-service
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 1
+          periodSeconds: 5
