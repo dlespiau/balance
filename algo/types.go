@@ -16,7 +16,8 @@ type EndpointSet interface {
 
 // LoadBalancer is an interface abstracting load balancing.
 type LoadBalancer interface {
-	// Get returns the Service Endpoint to use for the next request.
+	// Get returns the Service Endpoint to use for the next request. Get returns
+	// nil when no Endpoint hash been added to the load balancer.
 	Get() Endpoint
 	// Put releases the Endpoint when it has finished processing the request.
 	Put(endpoint Endpoint)
@@ -27,7 +28,8 @@ type LoadBalancer interface {
 type AffinityLoadBalancer interface {
 	// Get is called when wanting to send a request to a Service. It returns the
 	// Endpoint that request should be directed to, based on the affinity given
-	// affinity key.
+	// affinity key. Get returns nil when no Endpoint hash been added to the load
+	// balancer.
 	Get(key string) Endpoint
 	// Put releases the Endpoint when it has finished processing the request.
 	Put(endpoint Endpoint)
