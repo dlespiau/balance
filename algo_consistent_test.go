@@ -4,7 +4,7 @@
 // Originally from:
 //  https://github.com/golang/groupcache/blob/master/consistenthash/consistenthash_test.go
 
-package algo
+package balance
 
 import (
 	"fmt"

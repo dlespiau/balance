@@ -1,4 +1,4 @@
-package algo
+package balance
 
 // Hash is a 32-bit hash function.
 type Hash func(data []byte) uint32

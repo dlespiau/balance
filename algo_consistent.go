@@ -1,4 +1,4 @@
-package algo
+package balance
 
 import (
 	"hash/crc32"
