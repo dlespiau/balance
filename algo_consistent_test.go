@@ -14,10 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type e string
-
-func (e e) Key() string { return string(e) }
-
 func testHash(key []byte) uint32 {
 	i, err := strconv.Atoi(string(key))
 	if err != nil {
