@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubecon-proxy
+  labels:
+    app: kubecon-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubecon-proxy
+  template:
+    metadata:
+      labels:
+        app: kubecon-proxy
+    spec:
+      containers:
+      - name: service
+        image: dlespiau/kubecon-proxy
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        args:
+        - -k8s.service=kubecon-service

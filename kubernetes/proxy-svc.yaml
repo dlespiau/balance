@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubecon-proxy
+spec:
+  selector:
+    app: kubecon-proxy
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 8081
+    nodePort: 30081
