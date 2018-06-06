@@ -1,0 +1,5 @@
+FROM alpine:3.7
+LABEL maintainer="Damien Lespiau <damien@weave.works>"
+RUN apk add --no-cache ca-certificates
+COPY ./service /usr/bin/service
+ENTRYPOINT ["/usr/bin/service"]

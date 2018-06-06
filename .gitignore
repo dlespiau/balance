@@ -1,0 +1,5 @@
+/vendor
+/build
+
+/Gopkg.lock
+/Gopkg.toml

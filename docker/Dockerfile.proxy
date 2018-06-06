@@ -1,0 +1,6 @@
+FROM alpine:3.7
+LABEL maintainer="Damien Lespiau <damien@weave.works>"
+RUN apk add --no-cache ca-certificates
+COPY ./proxy /usr/bin/proxy
+ENTRYPOINT ["/usr/bin/proxy"]
+CMD ["-help"]
