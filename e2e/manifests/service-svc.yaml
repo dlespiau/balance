@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: balance-service
+spec:
+  selector:
+    app: balance-service
+  ports:
+  - protocol: TCP
+    port: 8080

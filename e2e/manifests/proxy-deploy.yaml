@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balance-proxy
+  labels:
+    app: balance-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: balance-proxy
+  template:
+    metadata:
+      labels:
+        app: balance-proxy
+    spec:
+      containers:
+      - name: proxy
+        image: quay.io/damien.lespiau/balance-proxy
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        args:
+        - -k8s.service=balance-service
