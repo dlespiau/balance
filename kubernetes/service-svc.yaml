@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: kubecon-service
+  name: balance-service
 spec:
   selector:
-    app: kubecon-service
+    app: balance-service
   type: NodePort
   ports:
   - protocol: TCP

@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: kubecon-proxy
+  name: balance-proxy
 spec:
   selector:
-    app: kubecon-proxy
+    app: balance-proxy
   type: NodePort
   ports:
   - protocol: TCP

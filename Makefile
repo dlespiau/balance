@@ -12,11 +12,11 @@ docker: .docker-proxy.done .docker-service.done
 
 .docker-%.done: docker/Dockerfile.%
 	cp $^ build/
-	docker build -t quay.io/damien.lespiau/balance/$* -f build/Dockerfile.$* ./build
+	docker build -t quay.io/damien.lespiau/balance-$* -f build/Dockerfile.$* ./build
 
 publish: all
-	docker push quay.io/damien.lespiau/balance/proxy
-	docker push quay.io/damien.lespiau/balance/service
+	docker push quay.io/damien.lespiau/balance-proxy
+	docker push quay.io/damien.lespiau/balance-service
 
 clean: clean-build clean-docker
 clean-build:

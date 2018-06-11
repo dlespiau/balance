@@ -1,24 +1,24 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kubecon-proxy
+  name: balance-proxy
   labels:
-    app: kubecon-proxy
+    app: balance-proxy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kubecon-proxy
+      app: balance-proxy
   template:
     metadata:
       labels:
-        app: kubecon-proxy
+        app: balance-proxy
     spec:
       containers:
       - name: service
-        image: dlespiau/kubecon-proxy
+        image: quay.io/damien.lespiau/balance-proxy
         imagePullPolicy: Always
         ports:
         - containerPort: 8081
         args:
-        - -k8s.service=kubecon-service
+        - -k8s.service=balance-service

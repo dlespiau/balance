@@ -1,22 +1,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kubecon-service
+  name: balance-service
   labels:
-    app: kubecon-service
+    app: balance-service
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: kubecon-service
+      app: balance-service
   template:
     metadata:
       labels:
-        app: kubecon-service
+        app: balance-service
     spec:
       containers:
       - name: service
-        image: dlespiau/kubecon-service
+        image: quay.io/damien.lespiau/balance-service
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
