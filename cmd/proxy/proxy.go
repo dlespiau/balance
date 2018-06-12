@@ -116,17 +116,21 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options) balance.LoadBalancer {
+func makeLoadBalancer(opts *options, service balance.Service) balance.LoadBalancer {
+	var balancer balance.LoadBalancer
+
 	switch opts.method {
 	case "consistent":
-		return balance.NewConsistent(balance.ConsistentConfig{})
+		balancer = balance.NewConsistent(balance.ConsistentConfig{})
 	case "bounded-load":
-		return balance.NewConsistent(balance.ConsistentConfig{
+		balancer = balance.NewConsistent(balance.ConsistentConfig{
 			LoadFactor: opts.boundedLoad.loadFactor,
 		})
 	default:
 		return nil
 	}
+
+	return balance.WithServiceFallback(balancer, service)
 }
 
 func main() {
@@ -148,6 +152,12 @@ func main() {
 		opts.kubeconfig = os.Getenv("KUBECONFIG")
 	}
 
+	service := balance.Service{
+		Namespace: opts.namespace,
+		Name:      opts.service,
+		Port:      "8080",
+	}
+
 	client, err := k8s.NewClientWithConfig(&k8s.ClientConfig{
 		Kubeconfig: opts.kubeconfig,
 	})
@@ -155,18 +165,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	balancer := makeLoadBalancer(&opts)
+	balancer := makeLoadBalancer(&opts, service)
 	if balancer == nil {
 		log.Fatal("unknown load balancing method: %s", opts.method)
 	}
 
 	watcher := balance.EndpointWatcher{
-		Client: client,
-		Service: balance.Service{
-			Namespace: opts.namespace,
-			Name:      opts.service,
-			Port:      "8080",
-		},
+		Client:   client,
+		Service:  service,
 		Receiver: balancer,
 	}
 
