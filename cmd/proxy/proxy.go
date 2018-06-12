@@ -43,7 +43,7 @@ type proxyStats struct {
 }
 
 type proxy struct {
-	balancer  balance.AffinityLoadBalancer
+	balancer  balance.LoadBalancer
 	header    string
 	reverse   httputil.ReverseProxy
 	noForward bool
@@ -116,7 +116,7 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options) interface{} {
+func makeLoadBalancer(opts *options) balance.LoadBalancer {
 	switch opts.method {
 	case "consistent":
 		return balance.NewConsistent(balance.ConsistentConfig{})
@@ -167,14 +167,14 @@ func main() {
 			Name:      opts.service,
 			Port:      "8080",
 		},
-		Receiver: balancer.(balance.EndpointSet),
+		Receiver: balancer,
 	}
 
 	watcher.Start(make(<-chan interface{}))
 
 	proxy := &proxy{
 		noForward: opts.noForward,
-		balancer:  balancer.(balance.AffinityLoadBalancer),
+		balancer:  balancer.(balance.LoadBalancer),
 		header:    opts.header,
 		reverse: httputil.ReverseProxy{
 			Director:  proxyDirector,

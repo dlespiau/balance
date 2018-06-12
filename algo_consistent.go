@@ -52,7 +52,7 @@ type Consistent struct {
 	endpoints    map[int]*endpointInfo // hash(Endpoint.Key()) -> endpointInfo
 }
 
-var _ AffinityLoadBalancer = &Consistent{}
+var _ LoadBalancer = &Consistent{}
 var _ EndpointSet = &Consistent{}
 
 // NewConsistent creates a new Consistent object.
@@ -175,8 +175,13 @@ func loadOK(totalLoad, numEndpoints, endpointLoad int, factor float64) bool {
 	return false
 }
 
-// Get implements AffinityLoadBalancer.
-func (c *Consistent) Get(key string) Endpoint {
+// Get implements LoadBalancer.
+func (c *Consistent) Get(keys ...string) Endpoint {
+	if len(keys) != 1 {
+		panic("consistent: affinity key not provided")
+	}
+	key := keys[0]
+
 	c.Lock()
 	defer c.Unlock()
 
@@ -221,7 +226,7 @@ func (c *Consistent) Get(key string) Endpoint {
 	return info.endpoint
 }
 
-// Put implements AffinityLoadBalancer.
+// Put implements LoadBalancer.
 func (c *Consistent) Put(endpoint Endpoint) {
 	c.Lock()
 	defer c.Unlock()
