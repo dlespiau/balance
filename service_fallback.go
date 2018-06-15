@@ -9,15 +9,11 @@ var _ LoadBalancer = &serviceFallback{}
 
 // WithServiceFallback wraps a load balancer, falling back to the service DNS
 // name when there's no available endpoint to serve the request.
-func WithServiceFallback(next LoadBalancer, s string) (LoadBalancer, error) {
-	service, err := NewServiceFromString(s)
-	if err != nil {
-		return nil, err
-	}
+func WithServiceFallback(next LoadBalancer, service *Service) LoadBalancer {
 	return &serviceFallback{
 		next:    next,
 		service: *service,
-	}, nil
+	}
 }
 
 func (sf *serviceFallback) AddEndpoints(endpoints ...Endpoint) {

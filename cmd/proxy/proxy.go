@@ -116,7 +116,7 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options, service balance.Service) (balance.LoadBalancer, error) {
+func makeLoadBalancer(opts *options, service *balance.Service) (balance.LoadBalancer, error) {
 	var balancer balance.LoadBalancer
 
 	switch opts.method {
@@ -130,7 +130,7 @@ func makeLoadBalancer(opts *options, service balance.Service) (balance.LoadBalan
 		return nil, fmt.Errorf("unknown load balancing method: %s", opts.method)
 	}
 
-	return balance.WithServiceFallback(balancer, service.String())
+	return balance.WithServiceFallback(balancer, service), nil
 }
 
 func main() {
@@ -152,7 +152,7 @@ func main() {
 		opts.kubeconfig = os.Getenv("KUBECONFIG")
 	}
 
-	service := balance.Service{
+	service := &balance.Service{
 		Namespace: opts.namespace,
 		Name:      opts.service,
 		Port:      "8080",
@@ -172,7 +172,7 @@ func main() {
 
 	watcher := balance.EndpointWatcher{
 		Client:   client,
-		Service:  service,
+		Service:  *service,
 		Receiver: balancer,
 	}
 
