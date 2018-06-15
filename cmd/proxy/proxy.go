@@ -116,7 +116,7 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options, service balance.Service) balance.LoadBalancer {
+func makeLoadBalancer(opts *options, service balance.Service) (balance.LoadBalancer, error) {
 	var balancer balance.LoadBalancer
 
 	switch opts.method {
@@ -127,10 +127,10 @@ func makeLoadBalancer(opts *options, service balance.Service) balance.LoadBalanc
 			LoadFactor: opts.boundedLoad.loadFactor,
 		})
 	default:
-		return nil
+		return nil, fmt.Errorf("unknown load balancing method: %s", opts.method)
 	}
 
-	return balance.WithServiceFallback(balancer, service)
+	return balance.WithServiceFallback(balancer, service.String())
 }
 
 func main() {
@@ -165,9 +165,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	balancer := makeLoadBalancer(&opts, service)
-	if balancer == nil {
-		log.Fatal("unknown load balancing method: %s", opts.method)
+	balancer, err := makeLoadBalancer(&opts, service)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	watcher := balance.EndpointWatcher{
