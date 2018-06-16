@@ -16,10 +16,13 @@ type fixtures struct {
 
 func makeFixtures(test *harness.Test) *fixtures {
 	// balance-service Deployment.
-	service := test.CreateDeploymentFromFile(test.Namespace, "service-deploy.yaml")
+	service := test.LoadDeployment("service-deploy.yaml")
+	service.Spec.Template.Spec.Containers[0].Image = serviceImage
+	test.CreateDeployment(test.Namespace, service)
 
 	// balance-proxy Deployment, making sure we tell it to watch the right service.
 	proxy := test.LoadDeployment("proxy-deploy.yaml")
+	proxy.Spec.Template.Spec.Containers[0].Image = proxyImage
 	proxy.Spec.Template.Spec.Containers[0].Args = proxyArgs(nil).
 		withNamespace(test.Namespace).
 		withServiceName(service.Name)

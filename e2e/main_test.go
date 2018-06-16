@@ -18,12 +18,18 @@ func manifestDirectory() string {
 	return filepath.Join(wd, "manifests")
 }
 
+var proxyImage string
+var serviceImage string
+
 func TestMain(m *testing.M) {
 	kubeconfig := flag.String("kubeconfig", "", "kube config path, e.g. $HOME/.kube/config")
 	noCleanup := flag.Bool("no-cleanup", false, "should test cleanup after themselves")
 	verbose := flag.Bool("log.verbose", false, "turn on more verbose logging")
 	interactive := flag.Bool("log.interactive", false, "print log messages as they happen")
-	//tag := flag.String("image-tag", "", "tag of docker images to test")
+
+	flag.StringVar(&proxyImage, "proxy-image", "quay.io/dlespiau/balance-proxy", "proxy docker image")
+	flag.StringVar(&serviceImage, "service-image", "quay.io/dlespiau/balance-service", "service docker image")
+
 	flag.Parse()
 
 	options := harness.Options{
