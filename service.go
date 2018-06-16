@@ -42,7 +42,7 @@ func splitHostPort(hostport string) (host, port string) {
 func NewServiceFromString(s string) (*Service, error) {
 	host, port := splitHostPort(s)
 
-	// XXX suport only one element in the host, defaulting to the namespace we are
+	// XXX support only one element in the host, defaulting to the namespace we are
 	// running in.
 	parts := strings.SplitN(host, ".", 3)
 	if len(parts) < 2 {
