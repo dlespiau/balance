@@ -14,6 +14,6 @@ gometalinter --tests --vendor --disable-all --deadline=600s \
     --enable=vet \
     --enable=ineffassign \
     --enable=gofmt \
-    --enable=gocyclo --cyclo-over=15 \
+    --enable=gocyclo --cyclo-over=20 \
     --enable=golint \
     ./...

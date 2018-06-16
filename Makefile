@@ -16,7 +16,7 @@ docker: .docker-proxy.done .docker-service.done
 
 .docker-%.done: docker/Dockerfile.%
 	cp $^ build/
-	docker build -t quay.io/damien.lespiau/balance-$* -f build/Dockerfile.$* ./build
+	docker build -t $(shell .ci/image $*) -f build/Dockerfile.$* ./build
 
 publish: all
 	docker push quay.io/damien.lespiau/balance-proxy
@@ -35,7 +35,7 @@ unit-tests:
 	@go test -v . ./cmd/...
 
 integration-tests:
-	if [ -n "$${PROXY_IMAGE}" -a -n "$${SERVICE_IMAGE}" ]; then \
+	@if [ -n "$${PROXY_IMAGE}" -a -n "$${SERVICE_IMAGE}" ]; then \
 	  go test -v ./e2e -args -log.verbose -proxy-image $${PROXY_IMAGE} -service-image $${SERVICE_IMAGE}}; \
 	else \
 	  go test -v ./e2e -args -log.verbose; \

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+
+component=$1
+ci=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+tag=$(${ci}/image-tag)
+
+if [ -n "${CI}" ]; then
+    echo "quay.io/damien.lespiau/balance-ci:${component}-${tag}"
+    exit 0
+fi
+
+echo "quay.io/damien.lespiau/balance-${component}:${tag}"

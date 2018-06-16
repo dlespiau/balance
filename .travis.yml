@@ -1,0 +1,24 @@
+sudo: required
+language: go
+go:
+  - "1.10.3"
+go_import_path: github.com/dlespiau/balance
+
+jobs:
+  include:
+      - stage: build
+        script:
+          - make dep
+          - make
+          - echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin quay.io
+          - docker push $(.ci/image proxy)
+          - docker push $(.ci/image service)
+      - script:
+          - make dep
+          - make lint
+          - make unit-tests
+      - stage: integration tests
+        script:
+          - make dep
+          - ./e2e/setup-minikube.sh v1.9.0
+          - make integration-tests PROXY_IMAGE=$(.ci/image proxy) SERVICE_IMAGE=$(.ci/image service)
