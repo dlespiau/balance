@@ -1,5 +1,9 @@
 all: build/proxy build/service docker
 
+dep:
+	go get -u github.com/golang/dep/cmd/dep
+	dep ensure
+
 # go build is clever enough (esp. since 1.10) to not build too much, just force
 # make to always call go build.
 build/%: FORCE
@@ -26,5 +30,4 @@ clean-docker:
 
 lint:
 	@.ci/go-lint.sh
-
-.PHONY: all publish clean clean-build clean-docker lint
+.PHONY: all publish clean clean-build clean-docker dep lint
