@@ -31,6 +31,9 @@ clean-docker:
 lint:
 	@.ci/go-lint.sh
 
+unit-tests:
+	@go test -v . ./cmd/...
+
 integration-tests:
 	if [ -n "$${PROXY_IMAGE}" -a -n "$${SERVICE_IMAGE}" ]; then \
 	  go test -v ./e2e -args -log.verbose -proxy-image $${PROXY_IMAGE} -service-image $${SERVICE_IMAGE}}; \
@@ -38,4 +41,4 @@ integration-tests:
 	  go test -v ./e2e -args -log.verbose; \
 	fi
 
-.PHONY: all publish clean clean-build clean-docker dep integration-tests lint
+.PHONY: all publish clean clean-build clean-docker dep integration-tests lint unit-tests
