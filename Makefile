@@ -24,4 +24,7 @@ clean-build:
 clean-docker:
 	rm -rf .docker-*.done
 
-.PHONY: all publish clean clean-build clean-docker
+lint:
+	@.ci/go-lint.sh
+
+.PHONY: all publish clean clean-build clean-docker lint
