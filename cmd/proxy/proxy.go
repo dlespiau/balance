@@ -43,7 +43,7 @@ type proxyStats struct {
 }
 
 type proxy struct {
-	balancer  balance.LoadBalancer
+	balancer  balance.Algorithm
 	header    string
 	reverse   httputil.ReverseProxy
 	noForward bool
@@ -116,8 +116,8 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options, service *balance.Service) (balance.LoadBalancer, error) {
-	var balancer balance.LoadBalancer
+func makeLoadBalancer(opts *options, service *balance.Service) (balance.Algorithm, error) {
+	var balancer balance.Algorithm
 
 	switch opts.method {
 	case "consistent":
@@ -180,7 +180,7 @@ func main() {
 
 	proxy := &proxy{
 		noForward: opts.noForward,
-		balancer:  balancer.(balance.LoadBalancer),
+		balancer:  balancer.(balance.Algorithm),
 		header:    opts.header,
 		reverse: httputil.ReverseProxy{
 			Director:  proxyDirector,

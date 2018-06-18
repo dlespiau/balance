@@ -14,8 +14,8 @@ type EndpointSet interface {
 	RemoveEndpoints(...Endpoint)
 }
 
-// LoadBalancer is an interface abstracting load balancing algorithms.
-type LoadBalancer interface {
+// Algorithm is an interface abstracting load balancing algorithms.
+type Algorithm interface {
 	EndpointSet
 	// Get returns the Service Endpoint to use for the next request.
 	//
@@ -28,8 +28,8 @@ type LoadBalancer interface {
 	// or more than one key is given. The variadic form is only used for
 	// aesthetics, ie. being able to use Get() which non-affinity load balancers.
 	//
-	// Get may return nil when the load balancer is not aware of any Endpoint. It's
-	// possible to tweak this behavior by wrapping a LoadBalancer into
+	// Get may return nil when the load balancer is not aware of any
+	// Endpoint.
 	Get(key ...string) Endpoint
 	// Put releases the Endpoint when it has finished processing the request.
 	Put(endpoint Endpoint)

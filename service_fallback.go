@@ -1,15 +1,15 @@
 package balance
 
 type serviceFallback struct {
-	next    LoadBalancer
+	next    Algorithm
 	service Service
 }
 
-var _ LoadBalancer = &serviceFallback{}
+var _ Algorithm = &serviceFallback{}
 
 // WithServiceFallback wraps a load balancer, falling back to the service DNS
 // name when there's no available endpoint to serve the request.
-func WithServiceFallback(next LoadBalancer, service *Service) LoadBalancer {
+func WithServiceFallback(next Algorithm, service *Service) Algorithm {
 	return &serviceFallback{
 		next:    next,
 		service: *service,
