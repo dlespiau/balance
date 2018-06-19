@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,6 +32,11 @@ func TestMain(m *testing.M) {
 	flag.StringVar(&serviceImage, "service-image", "quay.io/dlespiau/balance-service", "service docker image")
 
 	flag.Parse()
+
+	if testing.Verbose() {
+		fmt.Printf("using proxy image: %s\n", proxyImage)
+		fmt.Printf("using service image: %s\n", serviceImage)
+	}
 
 	options := harness.Options{
 		Kubeconfig:        *kubeconfig,
