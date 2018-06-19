@@ -16,7 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/dlespiau/balance"
-	k8s "github.com/dlespiau/balance/pkg/kubernetes"
 )
 
 func proxyDirector(req *http.Request) {}
@@ -43,7 +42,7 @@ type proxyStats struct {
 }
 
 type proxy struct {
-	balancer  balance.Algorithm
+	balancer  *balance.LoadBalancer
 	header    string
 	reverse   httputil.ReverseProxy
 	noForward bool
@@ -116,21 +115,23 @@ type options struct {
 	}
 }
 
-func makeLoadBalancer(opts *options, service *balance.Service) (balance.Algorithm, error) {
-	var balancer balance.Algorithm
+func makeLoadBalancer(opts *options, service *balance.Service) (*balance.LoadBalancer, error) {
+	var algo balance.Algorithm
 
 	switch opts.method {
 	case "consistent":
-		balancer = balance.NewConsistent(balance.ConsistentConfig{})
+		algo = balance.NewConsistent(balance.ConsistentConfig{})
 	case "bounded-load":
-		balancer = balance.NewConsistent(balance.ConsistentConfig{
+		algo = balance.NewConsistent(balance.ConsistentConfig{
 			LoadFactor: opts.boundedLoad.loadFactor,
 		})
 	default:
 		return nil, fmt.Errorf("unknown load balancing method: %s", opts.method)
 	}
 
-	return balance.WithServiceFallback(balancer, service), nil
+	return balance.NewLoadBalancer(service.String(), algo, balance.LoadBalancerOptions{
+		Fallback: balance.FallbackService,
+	}), nil
 }
 
 func main() {
@@ -158,29 +159,16 @@ func main() {
 		Port:      "8080",
 	}
 
-	client, err := k8s.NewClientWithConfig(&k8s.ClientConfig{
-		Kubeconfig: opts.kubeconfig,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	balancer, err := makeLoadBalancer(&opts, service)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	watcher := balance.EndpointWatcher{
-		Client:   client,
-		Service:  *service,
-		Receiver: balancer,
-	}
-
-	watcher.Start(make(<-chan interface{}))
+	balancer.Start(make(<-chan interface{}))
 
 	proxy := &proxy{
 		noForward: opts.noForward,
-		balancer:  balancer.(balance.Algorithm),
+		balancer:  balancer,
 		header:    opts.header,
 		reverse: httputil.ReverseProxy{
 			Director:  proxyDirector,

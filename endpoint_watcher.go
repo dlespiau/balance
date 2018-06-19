@@ -17,7 +17,7 @@ import (
 
 // EndpointWatcher load balances requests.
 type EndpointWatcher struct {
-	Client   *client.Clientset
+	Client   client.Interface
 	Service  Service
 	Receiver EndpointSet
 
@@ -96,6 +96,7 @@ func (w *EndpointWatcher) watchEvents(events watch.Interface, close <-chan inter
 // and notify the Receiver of Endpoints changes.
 // close is a channel the caller can close to terminate this goroutine.
 func (w *EndpointWatcher) Start(close <-chan interface{}) {
+	// XXX: should we bubble up some of the errors to the library user?
 	go func() {
 		for {
 			events, err := w.Client.CoreV1().Endpoints(w.Service.Namespace).Watch(metav1.ListOptions{
