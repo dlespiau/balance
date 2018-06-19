@@ -36,7 +36,7 @@ unit-tests:
 
 integration-tests:
 	@if [ -n "$${PROXY_IMAGE}" -a -n "$${SERVICE_IMAGE}" ]; then \
-	  go test -v ./e2e -args -log.verbose -proxy-image $${PROXY_IMAGE} -service-image $${SERVICE_IMAGE}}; \
+	  go test -v ./e2e -args -log.verbose -proxy-image $${PROXY_IMAGE} -service-image $${SERVICE_IMAGE}; \
 	else \
 	  go test -v ./e2e -args -log.verbose; \
 	fi
