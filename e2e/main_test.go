@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dlespiau/balance/e2e/harness"
-	"github.com/dlespiau/balance/e2e/harness/logger"
+	"github.com/dlespiau/kube-harness"
+	"github.com/dlespiau/kube-harness/logger"
 )
 
 var kube *harness.Harness

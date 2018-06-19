@@ -8,6 +8,15 @@
   version = "v1.1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/dlespiau/kube-harness"
+  packages = [
+    ".",
+    "logger"
+  ]
+  revision = "1ba3649c1ff92fb2e6b0eb10213e5a5cfe9c319f"
+
+[[projects]]
   name = "github.com/ghodss/yaml"
   packages = ["."]
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
@@ -324,6 +333,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c8621a159f179e792cac9917c4a8cb7a60fad84a148b6d70f5c14113e6271a75"
+  inputs-digest = "b399afb3a3c31cef2e07286d07f791ab54aecd7346f6b80b865861664b159c66"
   solver-name = "gps-cdcl"
   solver-version = 1

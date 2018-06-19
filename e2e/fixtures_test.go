@@ -3,7 +3,7 @@ package e2e
 import (
 	"time"
 
-	"github.com/dlespiau/balance/e2e/harness"
+	"github.com/dlespiau/kube-harness"
 
 	appsv1 "k8s.io/api/apps/v1beta2"
 )
