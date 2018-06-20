@@ -21,4 +21,4 @@ jobs:
         script:
           - make dep
           - ./e2e/setup-minikube.sh v1.9.0
-          - make integration-tests PROXY_IMAGE=$(.ci/image proxy) SERVICE_IMAGE=$(.ci/image service)
+          - make integration-tests
