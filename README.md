@@ -4,7 +4,7 @@ This repository implements in-process L7 load balancing algorithms for
 Kubernetes processes.
 
 - Go library for your Go microservices.
-- Uses the Kubernetes build-in Service discovery mechanism to find out which
+- Uses the Kubernetes built-in Service discovery mechanism to find out which
   endpoints requests can be routed to.
 - Offers an abstraction to implement a variety of L7 load balancing mechanisms.
 - Implements affinity and non-affinity algorithms.
