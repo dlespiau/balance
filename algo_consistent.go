@@ -85,6 +85,11 @@ var (
 		Name:      "lb_requests_total",
 		Help:      "Number of processed requests.",
 	}, []string{"name"})
+	requestsOverflowedCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: filename,
+		Name:      "lb_requests_overflowed_total",
+		Help:      "Number of requests that overflowed the load factor.",
+	}, []string{"name"})
 )
 
 // NewConsistent creates a new Consistent object.
@@ -241,6 +246,8 @@ func (c *Consistent) Get(keys ...string) Endpoint {
 		return info.endpoint
 	}
 
+	startIdx := idx
+
 	// Search for an endpoint with an acceptable load.
 	for {
 		if loadOK(c.totalLoad, c.numEndpoints, info.load, c.loadFactor) {
@@ -261,6 +268,9 @@ func (c *Consistent) Get(keys ...string) Endpoint {
 
 	totalLoadGauge.WithLabelValues(c.name).Set(float64(c.totalLoad))
 	requestsCounter.WithLabelValues(c.name).Inc()
+	if idx != startIdx {
+		requestsOverflowedCounter.WithLabelValues(c.name).Inc()
+	}
 
 	return info.endpoint
 }
