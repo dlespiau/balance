@@ -14,6 +14,9 @@ const (
 
 // ConsistentConfig holds the configuration for the Consistent hash algorithm.
 type ConsistentConfig struct {
+	// Name used for metrics and reporting
+	Name string
+
 	// Hash is the hashing function used for hash Endpoints and keys onto the hash
 	// ring. You may want to use an interesting hash function like xxHash.
 	// Defaults to CRC32.
@@ -43,6 +46,7 @@ type endpointInfo struct {
 // Consistent implements a consistent hashing algorithm.
 type Consistent struct {
 	sync.Mutex
+	name         string
 	hash         Hash
 	replicas     int
 	numEndpoints int
@@ -58,6 +62,7 @@ var _ EndpointSet = &Consistent{}
 // NewConsistent creates a new Consistent object.
 func NewConsistent(config ConsistentConfig) *Consistent {
 	c := &Consistent{
+		name:       config.Name,
 		replicas:   config.ReplicationCount,
 		loadFactor: config.LoadFactor,
 		hash:       config.Hash,
