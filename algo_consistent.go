@@ -3,9 +3,15 @@ package balance
 import (
 	"hash/crc32"
 	"math"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 const (
@@ -14,6 +20,9 @@ const (
 
 // ConsistentConfig holds the configuration for the Consistent hash algorithm.
 type ConsistentConfig struct {
+	// Name used for metrics and reporting
+	Name string
+
 	// Hash is the hashing function used for hash Endpoints and keys onto the hash
 	// ring. You may want to use an interesting hash function like xxHash.
 	// Defaults to CRC32.
@@ -43,6 +52,7 @@ type endpointInfo struct {
 // Consistent implements a consistent hashing algorithm.
 type Consistent struct {
 	sync.Mutex
+	name         string
 	hash         Hash
 	replicas     int
 	numEndpoints int
@@ -55,9 +65,37 @@ type Consistent struct {
 var _ Algorithm = &Consistent{}
 var _ EndpointSet = &Consistent{}
 
+// Prometheus metrics
+var (
+	// use program name as prefix for metrics
+	filename = strings.ReplaceAll(filepath.Base(os.Args[0]), ".", "_")
+
+	totalLoadGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: filename,
+		Name:      "lb_requests_inflight",
+		Help:      "Total number of requests in-flight.",
+	}, []string{"name"})
+	numEndpointsGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: filename,
+		Name:      "lb_endpoints",
+		Help:      "Number of endpoints for this service.",
+	}, []string{"name"})
+	requestsCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: filename,
+		Name:      "lb_requests_total",
+		Help:      "Number of processed requests.",
+	}, []string{"name"})
+	requestsOverflowedCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: filename,
+		Name:      "lb_requests_overflowed_total",
+		Help:      "Number of requests that overflowed the load factor.",
+	}, []string{"name"})
+)
+
 // NewConsistent creates a new Consistent object.
 func NewConsistent(config ConsistentConfig) *Consistent {
 	c := &Consistent{
+		name:       config.Name,
 		replicas:   config.ReplicationCount,
 		loadFactor: config.LoadFactor,
 		hash:       config.Hash,
@@ -73,6 +111,7 @@ func NewConsistent(config ConsistentConfig) *Consistent {
 	if c.hash == nil {
 		c.hash = crc32.ChecksumIEEE
 	}
+	numEndpointsGauge.WithLabelValues(c.name).Set(0)
 	return c
 }
 
@@ -116,6 +155,7 @@ func (c *Consistent) AddEndpoints(endpoints ...Endpoint) {
 	sort.Ints(c.keys)
 
 	c.Unlock()
+	numEndpointsGauge.WithLabelValues(c.name).Set(float64(c.numEndpoints))
 }
 
 func deleteFromSlice(s []int, hash int) []int {
@@ -162,6 +202,7 @@ func (c *Consistent) RemoveEndpoints(endpoints ...Endpoint) {
 	sort.Ints(c.keys)
 
 	c.Unlock()
+	numEndpointsGauge.WithLabelValues(c.name).Set(float64(c.numEndpoints))
 }
 
 func loadOK(totalLoad, numEndpoints, endpointLoad int, factor float64) bool {
@@ -205,6 +246,8 @@ func (c *Consistent) Get(keys ...string) Endpoint {
 		return info.endpoint
 	}
 
+	startIdx := idx
+
 	// Search for an endpoint with an acceptable load.
 	for {
 		if loadOK(c.totalLoad, c.numEndpoints, info.load, c.loadFactor) {
@@ -222,6 +265,12 @@ func (c *Consistent) Get(keys ...string) Endpoint {
 	// Endpoint found, update load.
 	info.load++
 	c.totalLoad++
+
+	totalLoadGauge.WithLabelValues(c.name).Set(float64(c.totalLoad))
+	requestsCounter.WithLabelValues(c.name).Inc()
+	if idx != startIdx {
+		requestsOverflowedCounter.WithLabelValues(c.name).Inc()
+	}
 
 	return info.endpoint
 }
@@ -242,4 +291,6 @@ func (c *Consistent) Put(endpoint Endpoint) {
 	}
 	info.load--
 	c.totalLoad--
+
+	totalLoadGauge.WithLabelValues(c.name).Set(float64(c.totalLoad))
 }
