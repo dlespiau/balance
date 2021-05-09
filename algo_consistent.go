@@ -30,7 +30,7 @@ type ConsistentConfig struct {
 
 	// ReplicationCount controls the number of virtual nodes to add to the hash
 	// ring for each Endpoint.
-	// Defaults to 128.
+	// Defaults to 256.
 	ReplicationCount int
 
 	// LoadFactor controls the maximum load of any endpoint. The load is defined as
